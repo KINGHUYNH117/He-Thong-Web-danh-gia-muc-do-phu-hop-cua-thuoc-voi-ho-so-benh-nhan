@@ -71,8 +71,12 @@ namespace HeTHongDanhGiaThuoc.Controllers
 
         // ================= CREATE =================
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            ViewBag.HoatChats = await _context.HoatChats
+                .OrderBy(x => x.TenHoatChat)
+                .ToListAsync();
+
             return View();
         }
 
@@ -154,19 +158,34 @@ namespace HeTHongDanhGiaThuoc.Controllers
 
         // ================= EDIT =================
         [HttpGet]
+        // public async Task<IActionResult> Edit(int id)
+        // {
+        //     var data = await _context.HoSoBenhNhans
+        //         .Include(x => x.BenhNens)
+        //         .Include(x => x.DiUngThuocs)
+        //             .ThenInclude(x => x.HoatChat)
+        //         .FirstOrDefaultAsync(x => x.MaBenhNhan == id);
+
+        //     if (data == null) return NotFound();
+
+        //     return View(data);
+        // }
         public async Task<IActionResult> Edit(int id)
         {
-            var data = await _context.HoSoBenhNhans
+            var benhNhan = await _context.HoSoBenhNhans
                 .Include(x => x.BenhNens)
                 .Include(x => x.DiUngThuocs)
-                    .ThenInclude(x => x.HoatChat)
                 .FirstOrDefaultAsync(x => x.MaBenhNhan == id);
 
-            if (data == null) return NotFound();
+            if (benhNhan == null)
+                return NotFound();
 
-            return View(data);
+            ViewBag.HoatChats = await _context.HoatChats
+                .OrderBy(x => x.TenHoatChat)
+                .ToListAsync();
+
+            return View(benhNhan);
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
